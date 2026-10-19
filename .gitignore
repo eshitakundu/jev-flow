@@ -1,0 +1,21 @@
+# Private interview notes requested by the project owner
+/INTERVIEW_GUIDE.md
+
+# Local references, account screenshots, and scratch work
+/.local/
+
+# Credentials are local; only blank examples belong in Git
+.env*
+!.env.example
+*.pem
+
+# Dependencies, build output, test artifacts, and editor files
+node_modules/
+.next/
+coverage/
+*.tsbuildinfo
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
