@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Activity,
   ArrowDown,
@@ -97,6 +97,22 @@ export default function Home() {
   const [dialog, setDialog] = useState<"rules" | "history" | "help" | null>(
     null,
   );
+  const opener = useRef<HTMLElement | null>(null);
+  const openDialog = (name: "rules" | "history" | "help") => {
+    opener.current ??= document.activeElement as HTMLElement | null;
+    setDialog(name);
+  };
+  // Escape works wherever focus sits; closing returns focus to the opener.
+  useEffect(() => {
+    if (!dialog) {
+      opener.current?.focus();
+      opener.current = null;
+      return;
+    }
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDialog(null);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [dialog]);
   const index = sampleFixtures.findIndex((item) => item.id === fixtureId);
   const person =
     index >= 0
@@ -172,8 +188,11 @@ export default function Home() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message, descriptions }),
         });
-        const body = await response.json();
-        if (!response.ok) throw new Error(body.error || "Request failed.");
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok)
+          throw new Error(
+            body.error || `Request failed (HTTP ${response.status}).`,
+          );
         evaluation = body;
       }
       setResult(evaluation);
@@ -183,7 +202,11 @@ export default function Home() {
           {
             evaluation,
             message,
-            subject: person.subject,
+            // An edited sample is a different message; don't mark the fixture tested.
+            subject:
+              fixture && message === fixture.message
+                ? person.subject
+                : "Custom support request",
             time: new Date().toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -241,7 +264,7 @@ export default function Home() {
           <button
             aria-label="Run history"
             className="nav-item"
-            onClick={() => setDialog("history")}
+            onClick={() => openDialog("history")}
           >
             <Activity size={17} />
             <span>Run history</span>
@@ -252,7 +275,7 @@ export default function Home() {
           <button
             aria-label="Routing rules"
             className="nav-item"
-            onClick={() => setDialog("rules")}
+            onClick={() => openDialog("rules")}
           >
             <SlidersHorizontal size={17} />
             <span>Routing rules</span>
@@ -282,7 +305,7 @@ export default function Home() {
           <button
             aria-label="How this works"
             className="nav-item"
-            onClick={() => setDialog("help")}
+            onClick={() => openDialog("help")}
           >
             <CircleHelp size={17} />
             <span>How this works</span>
@@ -309,7 +332,7 @@ export default function Home() {
             <button
               className="icon-button"
               aria-label="Run history"
-              onClick={() => setDialog("history")}
+              onClick={() => openDialog("history")}
             >
               <Activity size={17} />
             </button>
@@ -319,7 +342,7 @@ export default function Home() {
             <button
               className="icon-button"
               aria-label="How this works"
-              onClick={() => setDialog("help")}
+              onClick={() => openDialog("help")}
             >
               <CircleHelp size={18} />
             </button>
@@ -337,7 +360,11 @@ export default function Home() {
           </button>
         </div>
         <div className="experiment-bar">
-          <div className="mode-control" aria-label="Evaluation mode">
+          <div
+            className="mode-control"
+            role="group"
+            aria-label="Evaluation mode"
+          >
             <button
               aria-pressed={mode === "sample"}
               className={mode === "sample" ? "selected" : ""}
@@ -360,7 +387,7 @@ export default function Home() {
               ? "Sample data. No model calls."
               : "Real Jev via OpenCode’s free model."}
           </span>
-          <button className="policy-link" onClick={() => setDialog("rules")}>
+          <button className="policy-link" onClick={() => openDialog("rules")}>
             <Settings2 size={14} />
             <span>Review below {threshold}%</span>
           </button>
@@ -494,7 +521,18 @@ export default function Home() {
                   key={item.id}
                   role="tab"
                   aria-selected={tab === item.id}
-                  aria-controls={`view-${item.id}`}
+                  aria-controls={
+                    tab === item.id ? `view-${item.id}` : undefined
+                  }
+                  tabIndex={tab === item.id ? 0 : -1}
+                  onKeyDown={(e) => {
+                    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+                    const ids = ["message", "trace", "data"] as const;
+                    const step = e.key === "ArrowRight" ? 1 : -1;
+                    const next = ids[(ids.indexOf(item.id) + step + 3) % 3];
+                    setTab(next);
+                    document.getElementById(`tab-${next}`)?.focus();
+                  }}
                   id={`tab-${item.id}`}
                   className={tab === item.id ? "selected" : ""}
                   onClick={() => setTab(item.id)}
@@ -636,7 +674,7 @@ export default function Home() {
               </div>
             )}
             {stale && (
-              <div className="stale-note" role="status">
+              <div className="stale-note">
                 Input changed. Run a new decision to update the result.
               </div>
             )}
@@ -687,6 +725,14 @@ export default function Home() {
                       : "Not run"}
               </span>
             </div>
+            {/* Always mounted so screen readers announce changes to it. */}
+            <p className="sr-only" role="status">
+              {route
+                ? `Routed to ${route.destination}, ${route.team} team.`
+                : stale
+                  ? "Input changed. Run a new decision to update the result."
+                  : ""}
+            </p>
             {!route ? (
               <div className="empty-decision">
                 <div className="decision-orbit">
@@ -714,7 +760,7 @@ export default function Home() {
                 )}
               </div>
             ) : (
-              <div className="decision-result" aria-live="polite">
+              <div className="decision-result">
                 <div
                   className={`route-result ${route.destination === "Human review" ? "needs-review" : ""}`}
                 >
@@ -820,7 +866,7 @@ export default function Home() {
                 </b>
               </div>
               <p>
-                {result?.source === "live" && !stale
+                {mode === "live"
                   ? "Percentages show the selected answers’ probabilities. They are not guarantees."
                   : "Sample probabilities are illustrative. No model is called in Sample mode."}
               </p>
@@ -845,9 +891,9 @@ export default function Home() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="dialog-title"
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
-              if (e.key === "Escape") setDialog(null);
               if (e.key === "Tab") {
                 const focusable =
                   dialogRef.current?.querySelectorAll<HTMLElement>(
@@ -975,9 +1021,9 @@ export default function Home() {
                             </small>
                           </div>
                           <span className="history-probability">
-                            {item.evaluation.categoryConfidence?.toFixed(1) ??
-                              "—"}
-                            %
+                            {item.evaluation.categoryConfidence !== undefined
+                              ? `${item.evaluation.categoryConfidence.toFixed(1)}%`
+                              : "—"}
                           </span>
                         </article>
                       ))}

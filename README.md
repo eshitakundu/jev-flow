@@ -6,6 +6,14 @@ All destinations are simulated. Sample mode works without credentials or model r
 
 ![Jev Flow halftone inbox in sample mode](docs/halftone-demo.png)
 
+## Highlights
+
+- **Typed model output, deterministic policy.** The model only answers two constrained choice questions; a pure, unit-tested function decides the route. Changing the threshold reroutes instantly without another model call.
+- **Human-in-the-loop by default.** Missing or low-confidence answers go to human review instead of being guessed.
+- **Defensive provider boundary.** Zod validation on both request and response, a streamed body-size limit, a fixed free model, a 20-second timeout, no silent retries or paid fallbacks, and a server-side guard that keeps live calls off unless explicitly enabled.
+- **Prompt-injection aware.** The message is passed as data, and each question instructs the model to treat it as data rather than instructions.
+- **Inspectable decisions.** A React Flow trace and the raw request/response data show exactly which rule fired.
+
 ## Start locally
 
 Requirements: Node.js 22.18+ and npm. The project was verified with Node.js 24.11.1.
