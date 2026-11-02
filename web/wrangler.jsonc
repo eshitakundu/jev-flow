@@ -1,0 +1,16 @@
+{
+  // Public sample-only demo. Live Jev stays disabled and no provider key is set.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "jev-flow",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-15",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "vars": {
+    "ENABLE_LIVE_JEV": "false",
+  },
+  "workers_dev": true,
+}

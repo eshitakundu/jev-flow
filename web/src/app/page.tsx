@@ -337,7 +337,7 @@ export default function Home() {
               <Activity size={17} />
             </button>
             <span className="local-status">
-              <i /> Running locally
+              <i /> Simulated queues
             </span>
             <button
               className="icon-button"

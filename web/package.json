@@ -9,7 +9,10 @@
     "lint": "eslint",
     "test": "vitest run",
     "format": "prettier --write src *.config.* package.json tsconfig.json .prettierrc.json",
-    "format:check": "prettier --check src *.config.* package.json tsconfig.json .prettierrc.json"
+    "format:check": "prettier --check src *.config.* package.json tsconfig.json .prettierrc.json",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
@@ -21,6 +24,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.15",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -30,7 +34,8 @@
     "prettier": "^3.9.10",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.0",
+    "wrangler": "^4.156.1"
   },
   "engines": {
     "node": ">=22.18.0"
