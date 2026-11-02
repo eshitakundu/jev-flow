@@ -4,7 +4,11 @@ A support-triage inbox for experimenting with typed AI decisions. Choose a ficti
 
 All destinations are simulated. Sample mode works without credentials or model requests.
 
-![Jev Flow halftone inbox in sample mode](docs/halftone-demo.png)
+**[Try the live demo →](https://jev-flow.eshita-kundu-2026.workers.dev)** (sample mode only; live model calls are disabled on the public site)
+
+![Selecting an ambiguous message, running a decision that goes to human review, lowering the threshold to reroute it to the standard queue, and opening the decision trace](docs/demo.gif)
+
+*Sam's vague message scores 68% / 74%, so at an 80% threshold it goes to human review. Dropping the threshold to 65% reroutes it to the standard queue instantly, with no new model call.*
 
 ## Highlights
 
@@ -128,6 +132,14 @@ Verified stack: Next.js 16.4.3, React 19.2.8, Zod 4.6.7, React Flow 12.12.0, Luc
 - The displayed request duration includes the provider round trip and response processing; it excludes the animation.
 - The halftone layout supports narrow screens, visible focus and reduced motion. Formal accessibility certification has not been performed.
 
-## Optional public sample demo
+## Public sample demo
 
-No deployment has been created. A personal Vercel Hobby deployment can use root directory `web`, `ENABLE_LIVE_JEV=false`, and no provider key. The server guard also rejects direct live-endpoint requests. Local development is sufficient for the complete sample experiment.
+The [public demo](https://jev-flow.eshita-kundu-2026.workers.dev) runs on Cloudflare Workers through the OpenNext adapter, configured in `web/wrangler.jsonc` with `ENABLE_LIVE_JEV=false` and no provider key. The server guard rejects direct live-endpoint requests with HTTP 403.
+
+To deploy your own copy from `web/` (requires `npx wrangler login`):
+
+```powershell
+npm run cf:deploy
+```
+
+Next.js loads `.env.local` during builds, so move it aside before deploying to keep a local key out of the bundle. `npm run cf:preview` runs the Workers build locally.
