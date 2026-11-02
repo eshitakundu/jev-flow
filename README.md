@@ -4,9 +4,9 @@ A support-triage inbox for experimenting with typed AI decisions. Choose a ficti
 
 All destinations are simulated. Sample mode works without credentials or model requests.
 
-**[Try the live demo →](https://jev-flow.eshita-kundu-2026.workers.dev)** (sample mode only; live model calls are disabled on the public site)
+**[Try the live demo →](https://jevflow.eshita.dev)** (sample mode only; live model calls are disabled on the public site)
 
-![Selecting an ambiguous message, running a decision that goes to human review, lowering the threshold to reroute it to the standard queue, and opening the decision trace](docs/demo.gif)
+![Selecting an ambiguous message, running a decision that goes to human review, lowering the threshold to reroute it to the standard queue while the decision trace follows](docs/demo.gif)
 
 *Sam's vague message scores 68% / 74%, so at an 80% threshold it goes to human review. Dropping the threshold to 65% reroutes it to the standard queue instantly, with no new model call.*
 
@@ -33,7 +33,7 @@ Open [the local inbox](http://127.0.0.1:3000).
 1. Select Sam's ambiguous message and click **Run decision** in Sample mode.
 2. At the default 80% threshold, its illustrative probabilities send it to Human review.
 3. Lower the threshold to 65%; it moves to Standard queue without a new evaluation.
-4. Open Decision trace or Request data to inspect the result and routing rule.
+4. Each run opens the Decision trace, which replays the route. Request data shows the exact request and result.
 
 The inbox also supports message search, a tested-message filter, a routing-rules dialog, and a ten-run in-memory history. Refreshing clears history. Input edits make an existing result stale.
 
@@ -134,7 +134,7 @@ Verified stack: Next.js 16.4.3, React 19.2.8, Zod 4.6.7, React Flow 12.12.0, Luc
 
 ## Public sample demo
 
-The [public demo](https://jev-flow.eshita-kundu-2026.workers.dev) runs on Cloudflare Workers through the OpenNext adapter, configured in `web/wrangler.jsonc` with `ENABLE_LIVE_JEV=false` and no provider key. The server guard rejects direct live-endpoint requests with HTTP 403.
+The [public demo](https://jevflow.eshita.dev) runs on Cloudflare Workers through the OpenNext adapter, configured in `web/wrangler.jsonc` with `ENABLE_LIVE_JEV=false` and no provider key. The server guard rejects direct live-endpoint requests with HTTP 403.
 
 To deploy your own copy from `web/` (requires `npx wrangler login`):
 

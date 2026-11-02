@@ -13,4 +13,5 @@
     "ENABLE_LIVE_JEV": "false",
   },
   "workers_dev": true,
+  "routes": [{ "pattern": "jevflow.eshita.dev", "custom_domain": true }],
 }

@@ -197,6 +197,8 @@ export default function Home() {
       }
       setResult(evaluation);
       setReplay((n) => n + 1);
+      // Show the replaying trace right away instead of leaving it behind a tab.
+      setTab("trace");
       setHistory((items) =>
         [
           {
